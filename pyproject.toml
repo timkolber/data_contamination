@@ -5,7 +5,7 @@ description = "Default template for PDM package"
 authors = [
     {name = "Tim Kolber", email = "tim.kolber@stud.uni-heidelberg.de"},
 ]
-dependencies = []
+dependencies = ["datasets>=3.4.1"]
 requires-python = "==3.11.*"
 readme = "README.md"
 license = {text = "MIT"}
