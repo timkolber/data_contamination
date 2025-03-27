@@ -1,12 +1,17 @@
 from datasets import load_dataset
 
+alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
 
 def load_data(dataset_identifier: str):
     if dataset_identifier == "cais/mmlu":
         dataset = load_dataset(dataset_identifier, "all", split="test")
         dataset = dataset.rename_column("choices", "answers")
         dataset = dataset.rename_column("answer", "correct_answer")
-    elif dataset_identifier == "tau/commonsense_qa":
+    elif (
+        dataset_identifier == "ibragim-bad/arc_challenge"
+        or dataset_identifier == "ibragim-bad/arc_easy"
+    ):
         dataset = load_dataset(dataset_identifier, split="test")
         dataset = dataset.map(
             lambda example: {
@@ -14,7 +19,18 @@ def load_data(dataset_identifier: str):
                 "answers": example["choices"]["text"],
             }
         )
-        dataset = dataset.rename_column("answerKey", "correct_answer")
+        dataset = dataset.map(
+            lambda example: {
+                **example,
+                "correct_answer": example["answers"][
+                    (
+                        alphabet.index(example["answerKey"])
+                        if example["answerKey"] in alphabet
+                        else int(example["answerKey"]) - 1
+                    )
+                ],
+            }
+        )
     elif dataset_identifier == "openlifescienceai/medmcqa":
         dataset = load_dataset(dataset_identifier, split="test")
         dataset = dataset.map(
@@ -39,9 +55,9 @@ def load_data(dataset_identifier: str):
 
 if __name__ == "__main__":
     dataset_identifiers = [
-        "tau/commonsense_qa",
+        "ibragim-bad/arc_easy",
         "cais/mmlu",
-        "openlifescienceai/medmcqa",
+        "ibragim-bad/arc_challenge",
     ]
     for dataset_identifier in dataset_identifiers:
         dataset = load_data(dataset_identifier)

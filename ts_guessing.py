@@ -1,4 +1,5 @@
 import random
+from typing import Dict, List
 
 from data import load_data
 
@@ -22,7 +23,7 @@ def mask_wrong_answer(dataset):
         a_masked = random.choice(wrong_answers)
 
         masked_options = []
-        for answer in wrong_answers:
+        for answer in answers:
             if answer == a_corr:
                 masked_options.append(a_corr)
             elif answer == a_masked:
@@ -62,8 +63,20 @@ def mask_wrong_answer(dataset):
     return masked_data
 
 
+def evaluate_responses_accuracy(
+    masked_data: List[Dict[str, str]], responses: List[str]
+) -> float:
+    correct = 0
+    total = len(masked_data)
+    for item, response in zip(masked_data, responses):
+        generated_response_part = response[len(item["prompt"]) :]
+        if item["masked_answer"] in generated_response_part:
+            correct += 1
+    return correct / total
+
+
 if __name__ == "__main__":
-    dataset = load_data("tau/commonsense_qa")
+    dataset = load_data("ibragim-bad/arc_challenge")
     masked_output = mask_wrong_answer(dataset)
     for item in masked_output:
         print(item)
