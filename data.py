@@ -1,4 +1,4 @@
-from datasets import DatasetDict, load_dataset
+from datasets import load_dataset
 
 
 def load_data(dataset_identifier: str):
@@ -8,7 +8,12 @@ def load_data(dataset_identifier: str):
         dataset = dataset.rename_column("answer", "correct_answer")
     elif dataset_identifier == "tau/commonsense_qa":
         dataset = load_dataset(dataset_identifier, split="test")
-        dataset = dataset.rename_column("choices", "answers")
+        dataset = dataset.map(
+            lambda example: {
+                **example,
+                "answers": example["choices"]["text"],
+            }
+        )
         dataset = dataset.rename_column("answerKey", "correct_answer")
     elif dataset_identifier == "openlifescienceai/medmcqa":
         dataset = load_dataset(dataset_identifier, split="test")

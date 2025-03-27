@@ -14,7 +14,9 @@ def mask_wrong_answer(dataset):
         wrong_answers = [a for a in answers if a != a_corr]
 
         # Check for sufficient amount of answers (ignore Yes/No and True/False prompts)
-        if len(wrong_answers) < 3:
+        if (
+            len(wrong_answers) < 2
+        ):  # changed to 2 from 3 because our data has 3 wrong answers
             continue
 
         a_masked = random.choice(wrong_answers)
@@ -28,14 +30,32 @@ def mask_wrong_answer(dataset):
             else:
                 masked_options.append(answer)
 
-        template = f"{question} {a_corr} {masked_options[0]} {masked_options[1]} {masked_options[2]}"
+        alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        prompt = f""" Please try to fill in a wrong option into [MASK]. Provide only that option. The answer should be different from the other options.
+
+        Example:
+        Question: Which of the following is a bird?
+        Options:
+        A. Dove
+        B. [MASK]
+        C. Fox
+        D. Dolphin
+
+        Answer: Dog
+
+        Question: {question}
+        Options:
+        """
+        for i, option in enumerate(masked_options):
+            prompt += f"{alphabet[i]}. {option}\n"
+        # template = f"{question} {a_corr} {masked_options[0]} {masked_options[1]} {masked_options[2]}"
 
         masked_data.append(
             {
                 "question": question,
                 "correct_answer": a_corr,
                 "masked_answer": a_masked,
-                "masked_template": template,
+                "prompt": prompt,
             }
         )
 
