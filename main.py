@@ -5,7 +5,11 @@ from model import ModelAndTokenizer
 from ts_guessing import run_ts_guessing_evaluation
 
 
-def main(model_name_or_path: str, dataset_name_or_path: str, output_dir: str):
+def main(model_name_or_path: str, dataset_name_or_path: str, output_dir: str) -> None:
+    """
+    Main function to run the ts-guessing evaluation with the specified model and dataset.
+    Prints the accuracy to console.
+    """
     model = ModelAndTokenizer(
         model_name_or_path=model_name_or_path,
         max_input_length=1024,

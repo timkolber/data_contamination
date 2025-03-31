@@ -1,17 +1,20 @@
 import random
-from typing import Dict, List
+from typing import Any, Dict, List, cast
 
 import pandas as pd
-import torch
+from datasets import Dataset
 from tqdm import tqdm
 
 from data import load_data
 from model import ModelAndTokenizer
 
 
-def mask_wrong_answer(dataset):
+def mask_wrong_answer(dataset: Dataset) -> List[Dict[str, str]]:
+    """
+    Given the test split of a dataset, mask one of the wrong answers and return a list of dicts with
+    the question, the correct answer, the masked answer and the prompt to give to the model.
+    """
     masked_data = []
-
     for item in dataset:
         question = item["question"]
         answers = item["answers"]
@@ -64,11 +67,15 @@ def mask_wrong_answer(dataset):
                 "prompt": prompt,
             }
         )
-
     return masked_data
 
 
-def run_ts_guessing_evaluation(model: ModelAndTokenizer, dataset, output_file: str):
+def run_ts_guessing_evaluation(
+    model: ModelAndTokenizer, dataset: Dataset, output_file: str
+) -> float:
+    """
+    Given a model and a dataset, this function runs the loop over the dataset, generates a response for each item
+    and returns the accuracy of the model."""
     masked_data = mask_wrong_answer(dataset)
     masked_answers = []
     responses = []
@@ -89,6 +96,9 @@ def run_ts_guessing_evaluation(model: ModelAndTokenizer, dataset, output_file: s
 def evaluate_responses_accuracy(
     masked_data: List[Dict[str, str]], responses: List[str]
 ) -> float:
+    """
+    This function evaluates the accuracy of the predictions by checking if the masked answer is anywhere in the response by the model.
+    """
     correct = 0
     total = len(masked_data)
     for item, response in zip(masked_data, responses):

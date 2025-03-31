@@ -5,6 +5,11 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
 class ModelAndTokenizer:
+    """
+    This class hold the model and the tokenizer for a given model name or path.
+    It also handles applying the prompt template to the input and generating the response by the model.
+    """
+
     def __init__(
         self,
         model_name_or_path: str,
@@ -23,6 +28,9 @@ class ModelAndTokenizer:
         self.temperature = temperature
 
     def generate_response(self, prompt_str: str):
+        """
+        Given a prompt string, generate a response using the appropriate prompt template and decode the output.
+        """
         prompt = [{"role": "user", "content": prompt_str}]
         prompt = self.tokenizer.apply_chat_template(
             prompt, tokenize=False, add_generation_prompt=True

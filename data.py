@@ -1,9 +1,17 @@
-from datasets import load_dataset
+from typing import cast
+
+from datasets import Dataset, load_dataset
 
 alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-def load_data(dataset_identifier: str):
+def load_data(dataset_identifier: str) -> Dataset:
+    """
+    Loads the dataset from Huggingface and return it. The function renames and processes the columns to have the same format:
+    one column for the question ("question"),
+    one column for the answers ("answers") and
+    one column for the correct answer ("correct_answer")."
+    """
     if dataset_identifier == "cais/mmlu":
         dataset = load_dataset(dataset_identifier, "all", split="test")
         dataset = dataset.rename_column("choices", "answers")
@@ -72,7 +80,10 @@ def load_data(dataset_identifier: str):
                 "correct_answer": example["answers"][example["cop"]],
             }
         )
-    return dataset
+    else:
+        raise ValueError(f"Dataset {dataset_identifier} currently not supported.")
+
+    return cast(Dataset, dataset)
 
 
 if __name__ == "__main__":
