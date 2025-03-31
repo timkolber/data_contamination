@@ -1,0 +1,3 @@
+outputs/slurm/
+venv/
+__pycache__/

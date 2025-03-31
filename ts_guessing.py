@@ -1,7 +1,12 @@
 import random
 from typing import Dict, List
 
+import pandas as pd
+import torch
+from tqdm import tqdm
+
 from data import load_data
+from model import ModelAndTokenizer
 
 
 def mask_wrong_answer(dataset):
@@ -61,6 +66,24 @@ def mask_wrong_answer(dataset):
         )
 
     return masked_data
+
+
+def run_ts_guessing_evaluation(model: ModelAndTokenizer, dataset, output_file: str):
+    masked_data = mask_wrong_answer(dataset)
+    masked_answers = []
+    responses = []
+    for item in tqdm(masked_data):
+        response = model.generate_response(item["prompt"])
+        responses.append(response)
+        masked_answers.append(item["masked_answer"])
+
+    dataframe = pd.DataFrame()
+    dataframe["masked_answer"] = masked_answers
+    dataframe["response"] = responses
+    dataframe.to_csv(output_file, index=False)
+
+    accuracy = evaluate_responses_accuracy(masked_data, responses)
+    return accuracy
 
 
 def evaluate_responses_accuracy(

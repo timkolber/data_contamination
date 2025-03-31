@@ -1,3 +1,6 @@
+import gc
+
+import torch
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 
@@ -9,7 +12,11 @@ class ModelAndTokenizer:
         max_output_length: int = 512,
         temperature: float = 0.5,
     ):
-        self.model = AutoModelForCausalLM.from_pretrained(model_name_or_path)
+        self.model_name_or_path = model_name_or_path
+        self.device = "cuda" if torch.cuda.is_available() else "cpu"
+        self.model = AutoModelForCausalLM.from_pretrained(
+            model_name_or_path, torch_dtype="auto"
+        ).to(self.device)
         self.tokenizer = AutoTokenizer.from_pretrained(model_name_or_path)
         self.max_input_length = max_input_length
         self.max_output_length = max_output_length
@@ -26,11 +33,13 @@ class ModelAndTokenizer:
             max_length=self.max_input_length,
             truncation=True,
         )
+        inputs = inputs.to(self.device)
         outputs = self.model.generate(
             **inputs,
             max_length=self.max_output_length,
             temperature=self.temperature,
         )
+        del inputs
         return self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 
@@ -65,3 +74,6 @@ if __name__ == "__main__":
         Answer: 
         """
         print(model.generate_response(prompt))
+        del model
+        gc.collect()
+        torch.cuda.empty_cache()

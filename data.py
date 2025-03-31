@@ -31,6 +31,28 @@ def load_data(dataset_identifier: str):
                 ],
             }
         )
+
+    elif dataset_identifier == "allenai/openbookqa":
+        dataset = load_dataset(dataset_identifier, split="test")
+        dataset = dataset.map(
+            lambda example: {
+                **example,
+                "answers": example["choices"]["text"],
+            }
+        )
+        dataset = dataset.map(
+            lambda example: {
+                **example,
+                "correct_answer": example["answers"][
+                    (
+                        alphabet.index(example["answerKey"])
+                        if example["answerKey"] in alphabet
+                        else int(example["answerKey"]) - 1
+                    )
+                ],
+            }
+        )
+        dataset = dataset.rename_column("question_stem", "question")
     elif dataset_identifier == "openlifescienceai/medmcqa":
         dataset = load_dataset(dataset_identifier, split="test")
         dataset = dataset.map(
