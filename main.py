@@ -5,9 +5,9 @@ from model import ModelAndTokenizer
 from ts_guessing import run_ts_guessing_evaluation
 
 
-def main(model_name_or_path: str, dataset_name_or_path: str, output_dir: str) -> None:
+def main(model_name_or_path: str, dataset_name_or_path: str, output_dir: str, mask_amount: int) -> None:
     """
-    Main function to run the ts-guessing evaluation with the specified model and dataset.
+    Main function to run the ts-guessing evaluation with the specified model, dataset and amount of masked answers.
     Prints the accuracy to console.
     """
     model = ModelAndTokenizer(
@@ -20,7 +20,7 @@ def main(model_name_or_path: str, dataset_name_or_path: str, output_dir: str) ->
     model_name = model_name_or_path.split("/")[-1]
     dataset_name = dataset_name_or_path.split("/")[-1]
     accuracy = run_ts_guessing_evaluation(
-        model, data, output_dir + f"/{model_name}-{dataset_name}.txt"
+        model, data, output_dir + f"/{model_name}-{dataset_name}-masked-{mask_amount}.txt", mask_amount
     )
     print(f"Accuracy {model_name_or_path}-{dataset_name}: {accuracy:.2%}")
 
@@ -47,5 +47,12 @@ if __name__ == "__main__":
         default="./outputs",
         help="Directory to save the output in.",
     )
+    parser.add_argument(
+        "--mask_amount",
+        type=int,
+        default=1,
+        help="Amount of wrong answers that should be masked.",
+    )
+
     args = parser.parse_args()
-    main(args.model, args.dataset, args.output_dir)
+    main(args.model, args.dataset, args.output_dir, args.mask_amount)
