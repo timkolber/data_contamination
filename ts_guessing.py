@@ -1,4 +1,5 @@
 import random
+import re
 from typing import Any, Dict, List, Tuple, cast, Union
 
 import pandas as pd
@@ -112,11 +113,11 @@ def evaluate_responses_accuracy(
     for item, response in zip(masked_data, responses):
         generated_response_part = response[len(item["prompt"]) :]
         for masked_answer in item["masked_answers"]:
-            if masked_answer in generated_response_part:
+            if re.search(rf'\b{re.escape(masked_answer)}\b', generated_response_part):
                 correct_separate += 1
-            if mask_amount > 1:    
-                if all(x in response for x in item["masked_answers"]):
-                    correct_grouped += 1
+        if mask_amount > 1:    
+            if all(x in response for x in item["masked_answers"]):
+                correct_grouped += 1
 
     if mask_amount == 1:
         return correct_separate / total_separate
