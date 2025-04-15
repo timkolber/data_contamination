@@ -22,7 +22,13 @@ def main(model_name_or_path: str, dataset_name_or_path: str, output_dir: str, ma
     accuracy = run_ts_guessing_evaluation(
         model, data, output_dir + f"/{model_name}-{dataset_name}-masked-{mask_amount}.txt", mask_amount
     )
-    print(f"Accuracy {model_name_or_path}-{dataset_name}: {accuracy:.2%}")
+    if isinstance(accuracy, tuple):
+        accuracy_separate, accuracy_grouped = accuracy
+        print(f"Separate Accuracy {model_name_or_path}-{dataset_name}: {accuracy_separate:.2%}")
+        print(f"Grouped Accuracy  {model_name_or_path}-{dataset_name}: {accuracy_grouped:.2%}")
+    else:
+        accuracy_separate = accuracy
+        print(f"Accuracy {model_name_or_path}-{dataset_name}: {accuracy:.2%}")
 
 
 if __name__ == "__main__":

@@ -19,4 +19,4 @@
     - running the evaluation loop
     - return the accuracy of a model over the whole dataset
 
-To run the evaluation, you run the main.py script. With the argument `--model` you can specify the model name or path from huggingface. `--dataset` specifies the dataset to evaluate contamination for. With `--output_dir` you can select an output directory for the model responses. 
+To run the evaluation, you run the main.py script. With the argument `--model` you can specify the model name or path from huggingface. `--dataset` specifies the dataset to evaluate contamination for. With `--output_dir` you can select an output directory for the model responses. `--mask_amount` defines how many of the wrong answers should be masked.

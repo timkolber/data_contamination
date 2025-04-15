@@ -1,3 +1,5 @@
+Separate Accuracy
+
 arc-easy:
 Accuracy meta-llama/Meta-Llama-3-8B-Instruct-arc_easy: 3.39%
 Accuracy mistralai/Mistral-7B-Instruct-v0.3-arc_easy: 6.21%
@@ -13,5 +15,19 @@ Accuracy meta-llama/Meta-Llama-3-8B-Instruct-openbookqa: 2.80%
 Accuracy mistralai/Mistral-7B-Instruct-v0.3-openbookqa: 3.90%
 Accuracy microsoft/phi-4-openbookqa: 5.50%
 
+Grouped Accuracy
 
+arc-easy:
+Accuracy meta-llama/Meta-Llama-3-8B-Instruct-arc_easy: 0.97%
+Accuracy mistralai/Mistral-7B-Instruct-v0.3-arc_easy: 1.85%
+Accuracy microsoft/phi-4-arc_easy: 4.5%
 
+arc-challenge:
+Accuracy meta-llama/Meta-Llama-3-8B-Instruct-arc_challenge: 0.6%
+Accuracy mistralai/Mistral-7B-Instruct-v0.3-arc_challenge: 2.3%
+Accuracy microsoft/phi-4-arc_challenge: 4.78%
+
+openbook-qa:
+Accuracy meta-llama/Meta-Llama-3-8B-Instruct-openbookqa: 0.4%
+Accuracy mistralai/Mistral-7B-Instruct-v0.3-openbookqa: 0.8%
+Accuracy microsoft/phi-4-openbookqa: 1.2%

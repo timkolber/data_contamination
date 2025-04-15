@@ -1,5 +1,5 @@
 import random
-from typing import Any, Dict, List, cast
+from typing import Any, Dict, List, Tuple, cast, Union
 
 import pandas as pd
 from datasets import Dataset
@@ -72,7 +72,7 @@ def mask_wrong_answer(dataset: Dataset, mask_amount: int) -> List[Dict[str, str]
 
 def run_ts_guessing_evaluation(
     model: ModelAndTokenizer, dataset: Dataset, output_file: str, mask_amount: int
-) -> float:
+) -> Union[float, Tuple[float, float]]:
     """
     Given a model and a dataset, this function runs the loop over the dataset, generates a response for each item
     and returns the accuracy of the model."""
@@ -89,24 +89,39 @@ def run_ts_guessing_evaluation(
     dataframe["response"] = responses
     dataframe.to_csv(output_file, index=False)
 
-    accuracy = evaluate_responses_accuracy(masked_data, responses, mask_amount)
-    return accuracy
+    accuracy_results = evaluate_responses_accuracy(masked_data, responses, mask_amount)
+    if isinstance(accuracy_results, tuple):
+        accuracy_separate, accuracy_grouped = accuracy_results
+        return accuracy_separate, accuracy_grouped
+    else:
+        return accuracy_results
 
 
 def evaluate_responses_accuracy(
     masked_data: List[Dict[str, str]], responses: List[str], mask_amount: int
-) -> float:
+) -> Union[float, Tuple[float, float]]:
     """
-    This function evaluates the accuracy of the predictions by checking if the masked answer is anywhere in the response by the model.
+    This function evaluates the accuracy of the predictions by checking if the masked answers are anywhere in the response by the model by counting each answer
+    separately or grouped together.
     """
-    correct = 0
-    total = len(masked_data) * mask_amount
+    correct_separate = 0
+    total_separate = len(masked_data) * mask_amount
+    correct_grouped = 0
+    total_grouped = len(masked_data)
+
     for item, response in zip(masked_data, responses):
         generated_response_part = response[len(item["prompt"]) :]
         for masked_answer in item["masked_answers"]:
             if masked_answer in generated_response_part:
-                correct += 1
-    return correct / total
+                correct_separate += 1
+            if mask_amount > 1:    
+                if all(x in response for x in item["masked_answers"]):
+                    correct_grouped += 1
+
+    if mask_amount == 1:
+        return correct_separate / total_separate
+    else:
+        return correct_separate / total_separate, correct_grouped / total_grouped
 
 
 if __name__ == "__main__":
